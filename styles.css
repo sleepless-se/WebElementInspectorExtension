@@ -1,0 +1,7 @@
+.highlight {
+    outline: 3px solid red !important;
+}
+
+.selected {
+    outline: 3px solid rgb(74, 3, 255) !important;
+}
