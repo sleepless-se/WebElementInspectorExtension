@@ -21,24 +21,8 @@ document.addEventListener('mouseover', function (e) {
 // Mouse click event to get element info based on the selection mode
 document.addEventListener('click', function (e) {
     e.preventDefault();
-    window.selectionMode = 'image';
     if (window.selectionMode === 'image') {
-        let imgElement = e.target.querySelector('img');
-
-        // If no image found in the children, look for an image in the siblings of the parent
-        if (!imgElement) {
-            const parent = e.target.parentElement;
-            const children = Array.from(parent.children);
-
-            // Exclude the current element
-            const otherChildren = children.filter(child => child !== e.target);
-
-            // Search for an image in the other children
-            otherChildren.some(child => {
-                imgElement = child.querySelector('img');
-                return !!imgElement; // Stop searching if an image is found
-            });
-        }
+        let imgElement = findImageElement(e.target);
 
         if (imgElement) {
             console.log('Image Element Info JSON:', getElementInfosByJson(imgElement));
@@ -47,6 +31,37 @@ document.addEventListener('click', function (e) {
         console.log('Text Element Info JSON:', getElementInfosByJson(e.target));
     }
 });
+
+function findImageElement(target) {
+    let imgElement = target.querySelector('img');
+
+    // If no image found in the children, look for an image in the siblings of the parent
+    if (!imgElement) {
+        const parent = target.parentElement;
+        const children = Array.from(parent.children);
+
+        // Exclude the current element
+        const otherChildren = children.filter(child => child !== target);
+
+        // Search for an image in the other children
+        otherChildren.some(child => {
+            imgElement = child.querySelector('img');
+            return !!imgElement; // Stop searching if an image is found
+        });
+    }
+
+    // If no <img> tag found, look for a background-image in the style attribute
+    if (!imgElement) {
+        const backgroundImage = target.style.backgroundImage;
+        if (backgroundImage && backgroundImage !== 'none') {
+            // Return the element itself if it has a background image
+            imgElement = target;
+        }
+    }
+
+    return imgElement;
+}
+
 
 
 // Function to get element information in JSON format
