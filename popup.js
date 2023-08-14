@@ -1,13 +1,9 @@
 document.getElementById('textMode').addEventListener('click', function () {
-    chrome.tabs.executeScript({
-        code: `window.selectionMode = 'text';`
-    });
+    chrome.storage.local.set({ selectionMode: 'text' });
     window.close();
 });
 
 document.getElementById('imageMode').addEventListener('click', function () {
-    chrome.tabs.executeScript({
-        code: `window.selectionMode = 'image';`
-    });
+    chrome.storage.local.set({ selectionMode: 'image' });
     window.close();
 });

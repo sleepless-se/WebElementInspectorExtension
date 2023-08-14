@@ -1,7 +1,13 @@
 let highlightedElement;
 
 // Global variable to store the selection mode (text or image)
-window.selectionMode = 'text';
+window.selectionMode = 'image';
+// Load the selection mode from storage
+// chrome.storage.local.get(['selectionMode'], function (result) {
+//     window.selectionMode = result.selectionMode || 'text';
+// });
+
+// ... その他のコードは変更なし
 
 // Mouse over event to highlight element
 document.addEventListener('mouseover', function (e) {
@@ -15,8 +21,25 @@ document.addEventListener('mouseover', function (e) {
 // Mouse click event to get element info based on the selection mode
 document.addEventListener('click', function (e) {
     e.preventDefault();
+    window.selectionMode = 'image';
     if (window.selectionMode === 'image') {
-        const imgElement = e.target.querySelector('img');
+        let imgElement = e.target.querySelector('img');
+
+        // If no image found in the children, look for an image in the siblings of the parent
+        if (!imgElement) {
+            const parent = e.target.parentElement;
+            const children = Array.from(parent.children);
+
+            // Exclude the current element
+            const otherChildren = children.filter(child => child !== e.target);
+
+            // Search for an image in the other children
+            otherChildren.some(child => {
+                imgElement = child.querySelector('img');
+                return !!imgElement; // Stop searching if an image is found
+            });
+        }
+
         if (imgElement) {
             console.log('Image Element Info JSON:', getElementInfosByJson(imgElement));
         }
@@ -24,6 +47,7 @@ document.addEventListener('click', function (e) {
         console.log('Text Element Info JSON:', getElementInfosByJson(e.target));
     }
 });
+
 
 // Function to get element information in JSON format
 function getElementInfosByJson(element) {
