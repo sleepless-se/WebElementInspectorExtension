@@ -1,13 +1,24 @@
 let highlightedElement;
 
 // Global variable to store the selection mode (text or image)
-window.selectionMode = 'image';
+let selectionMode = 'text';
+// Function to update selection mode
+function updateSelectionMode() {
+    chrome.storage.local.get(['selectionMode'], function (result) {
+        selectionMode = result.selectionMode || 'text';
+        console.log('Selection mode:', selectionMode);
+    });
+}
 // Load the selection mode from storage
-// chrome.storage.local.get(['selectionMode'], function (result) {
-//     window.selectionMode = result.selectionMode || 'text';
-// });
+updateSelectionMode();
 
-// ... その他のコードは変更なし
+// Listen for changes in storage
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    if (changes.selectionMode) {
+        updateSelectionMode();
+    }
+});
+
 
 // Mouse over event to highlight element
 document.addEventListener('mouseover', function (e) {
@@ -21,7 +32,7 @@ document.addEventListener('mouseover', function (e) {
 // Mouse click event to get element info based on the selection mode
 document.addEventListener('click', function (e) {
     e.preventDefault();
-    if (window.selectionMode === 'image') {
+    if (selectionMode === 'image') {
         let imgElement = findImageElement(e.target);
 
         if (imgElement) {
